@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Delivering learnr tutorials in a package</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<script src="libs/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="snippets/snippets.js" type="text/javascript" charset="utf-8"></script>
+
+<style type="text/css">
+.snippet {
+  border: solid 1px #cccccc;
+  margin-bottom: 12px;
+  width: 100%;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">learnr</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="exercises.html">Exercises</a>
+</li>
+<li>
+  <a href="questions.html">Questions</a>
+</li>
+<li>
+  <a href="publishing.html">Publishing</a>
+</li>
+<li>
+  <a href="formats.html">Formats</a>
+</li>
+<li>
+  <a href="examples.html">Examples</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/rstudio/learnr">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Delivering learnr tutorials in a package</h1>
+
+</div>
+
+
+<p><br />
+</p>
+<div id="a-package-for-the-learnr-occasion" class="section level2">
+<h2>A Package for the <code>learnr</code> occasion</h2>
+<p><br />
+</p>
+<p>Packages are not just for functions and data– you can create a package to deliver interactive tutorials to an audience, too! If you want to share your learnr tutorial with a large group of users (e.g. large courses where many students will likely run the same tutorials simultaneously), putting your tutorial inside of a package may actually be one the <em>best</em> ways to get your content to your audience. Why? Because after the package has been installed and loaded, users can run your tutorial <em>locally</em>– which means that <em>you</em> don’t have to worry about potential bandwidth limits and issues that might otherwise arise when learnr tutorials are hosted on external servers.</p>
+<p>Putting your learnr tutorial in a package is also free– and always will be, which means you can also sidestep costs associated with hosting services! Your package doesn’t have to be on CRAN, and it doesn’t have to contain functions or data (but it can if you want!).</p>
+<p>Never made a package before? No sweat! This post will guide you through.</p>
+<p><br />
+</p>
+</div>
+<div id="how-to-make-a-package-for-a-learnr-tutorial" class="section level2">
+<h2>How to make a package for a learnr tutorial</h2>
+<p>We will walk through the steps for creating the bare-minimum package that you can use to house and deliver your interactive learnr tutorials to your users.</p>
+<p>Our final goal is to create a package that is “downloadable” by users, which means this package needs a GitHub repository so that it can be easily shared. If students wanted to, they’d be able to find the source code and solutions in your GitHub repository (or, with some spelunking, in the folder that houses all their R packages locally). But this would take some extra effort on the part of students.</p>
+<p>If a solution like this still works for your purposes, then read onwards!</p>
+<p><br />
+</p>
+<div id="pre-requisites" class="section level3">
+<h3>Pre-requisites</h3>
+<p>We assume the following:</p>
+<ul>
+<li>You have a GitHub account (but don’t need to be more than a GitHub novice)</li>
+<li>You are comfortable with the basics of using R and RStudio</li>
+<li>You understand how R projects work</li>
+<li>You are already familiar with creating a regular learnr tutorial</li>
+</ul>
+<p><br />
+</p>
+</div>
+<div id="getting-set-up" class="section level3">
+<h3>Getting set up</h3>
+<p>Let’s make sure we have all the pieces in place to create a learnr tutorial package.<br />
+</p>
+<div id="packages" class="section level4">
+<h4>Packages</h4>
+<p>Make sure you’ve installed and loaded the following packages:</p>
+<pre class="r"><code>#install.packages(c(&quot;usethis&quot;, &quot;devtools&quot;, &quot;roxygen2&quot;))
+library(usethis)
+library(roxygen2)
+library(devtools)
+library(learnr)</code></pre>
+<p><br />
+</p>
+</div>
+<div id="create-a-github-repository" class="section level4">
+<h4>Create a GitHub repository</h4>
+<p>If you’re already familiar with the ins and outs of connecting an R Project to a GitHub repository, you can skip this section.<br />
+We recommend following the tips on <a href="https://happygitwithr.com/new-github-first.html#make-a-repo-on-github-2">Happy Git with R</a> and starting in GitHub before switching to RStudio.</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="https://happygitwithr.com/new-github-first.html#make-a-repo-on-github-2"><strong>Create a new repository on GitHub</strong></a> for your work.</p>
+<ul>
+<li>The repository name you choose will also end up being the name of your package, so choose wisely! For the examples in this guide, we’ll go with “tutorialpackage”.</li>
+</ul></li>
+<li><p><strong>Copy the repository URL</strong> to your clipboard.</p>
+<ul>
+<li><p>Do this by clicking the green Clone or Download button.<br />
+</p></li>
+<li><p>Copy the HTTPS clone URL (looks like: <code>https://github.com/{yourname}/{yourrepo}.git</code>).</p></li>
+<li><p><strong>Or</strong>, copy the SSH URL if you chose to set up SSH keys (looks like: <code>git@github.com:{yourname}/{yourrepo}.git</code>).</p></li>
+</ul></li>
+<li><p><strong>Open RStudio</strong> and <a href="https://happygitwithr.com/new-github-first.html#new-rstudio-project-via-git-clone">create a new RStudio Project via git clone</a>.</p>
+<ul>
+<li><p>Do this by clicking File &gt; New Project &gt; Version Control &gt; Git.</p></li>
+<li><p>Paste the copied URL.</p></li>
+<li><p>Be intentional about where you tell RStudio to create this new Project.</p></li>
+</ul></li>
+<li><p><strong>Click Create Project.</strong></p>
+<ul>
+<li>Your R Project is now connected to GitHub!</li>
+</ul></li>
+</ol>
+<p><br />
+</p>
+</div>
+</div>
+<div id="add-files-and-directories-for-a-package" class="section level3">
+<h3>Add files and directories for a package</h3>
+<p>Now we’ll create the infrastructure to turn this R project into a <em>package</em>. A handful of new files need to be created, but luckily we can outsource this heavy lifting to the <code>create_package()</code> function from the <a href="https://usethis.r-lib.org/">usethis</a> package.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Create the necessary package infrastructure</strong> when you run:</p>
+<pre class="r"><code>usethis::create_package(getwd())</code></pre></li>
+<li><p>The console output will ask if you’d like to overwrite the pre-existing R project. <strong>Select <em>No</em></strong>.</p>
+<center>
+<p><img src="images/pkg-overwrite.png" style="width:50.0%" /></p>
+</center></li>
+<li><p>A second session of RStudio will open – this session has a <em>Build</em> tab in the pane which also has the tabs Environment, History, etc. This tab is specific for building packages, and we will use it later. <strong>You can close the first RStudio instance</strong>.</p>
+<center>
+<p><img src="images/pkg-build.png" style="width:50.0%" /></p>
+</center>
+<ul>
+<li>Your project directory should end up looking something like this:</li>
+</ul>
+<center>
+<p><img src="images/pkg-directory.png" style="width:50.0%" /></p>
+</center></li>
+</ol>
+<p> </p>
+</div>
+<div id="add-files-and-directories-for-a-tutorial" class="section level3">
+<h3>Add files and directories for a tutorial</h3>
+<p>Now that the package structure is in place, it’s time to add tutorial content. Again, the usethis package will do the dirty work for us to create the folders and files we need for a learnr tutorial within our package.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Create the learnr tutorial</strong> and open it for editing when you run <code>usethis::use_tutorial("&lt;name-of-learnr-file&gt;", "&lt;Title You'd Like the User to See&gt;")</code>:</p>
+<pre class="r"><code>usethis::use_tutorial(&quot;lesson1&quot;, &quot;Your First Lesson&quot;, open = interactive())</code></pre>
+<ul>
+<li><p>The first argument is the basename for the learnr R Markdown file you are creating. You do not need the <code>.Rmd</code> file extension here.</p></li>
+<li><p>The second argument is what you want the user-facing title of the tutorial to be.</p></li>
+<li><p>This creates an <code>inst/</code> directory with some subfolders. If you’re not new to creating learnr tutorials, the folder structure here will look familiar to you – there’s nothing different about learnr tutorial directories inside and outside of packages.</p>
+<p>You can open up <code>inst/</code> and its subsequent subfolders until you reach the <code>.Rmd</code> file you created:</p>
+<pre><code>/inst/tutorials/&lt;name-of-learnr-file&gt;/&lt;name-of-learnr-file.Rmd&gt;</code></pre></li>
+</ul>
+<center>
+<p><img src="images/pkg-inst.png" style="width:50.0%" /></p>
+</center></li>
+<li><p><strong>Edit the open <code>.Rmd</code> file</strong> and customize your tutorial as you normally would.</p></li>
+<li><p><strong>Repeat</strong> for each additional tutorials you want to include in this package.</p></li>
+</ol>
+<p><br />
+</p>
+</div>
+<div id="build-install-and-use-your-tutorial-package" class="section level3">
+<h3>Build, install, and use your tutorial package</h3>
+<p>Time to build the package and install it in your R system library.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Navigate to the <em>Build</em> pane</strong> of your RStudio IDE. Then <strong>click <em>Install and Restart</em></strong>. Alternatively, run:</p>
+<pre class="r"><code>devtools::install()</code></pre>
+<p>Believe it or not, you’ve now made a package with a learnr tutorial inside!</p>
+<p>You should test that your package has been properly created by calling the function that will load your tutorial from your installed package:</p></li>
+<li><p><strong>Run your tutorial</strong> with <code>learnr::run_tutorial("&lt;tutorial-name&gt;", "&lt;package-name&gt;")</code>.</p>
+<pre class="r"><code>learnr::run_tutorial(&quot;lesson1&quot;, &quot;tutorialpackage&quot;)</code></pre>
+<ul>
+<li>The tutorial name here refers to the name of the <code>.Rmd</code> basename, not the user-facing title.</li>
+<li>The live tutorial will open up in a local browser window 🥳</li>
+<li>This code is also how your users will be able to run your tutorial once they have installed your package.</li>
+</ul></li>
+</ol>
+<p><br />
+</p>
+</div>
+<div id="optionally-add-dependencies-for-exercise-checking" class="section level3">
+<h3>(Optionally) Add dependencies for exercise checking</h3>
+<p>If your tutorial includes <a href="https://rstudio.github.io/learnr/exercises.html#Exercise_Checking">exercises that can be checked via an external package</a> (like <a href="https://rstudio-education.github.io/gradethis/">gradethis</a>, for example), you’ll need to make sure this package gets installed along with your custom package. To do this, the external package needs to be added as an <code>Imports</code> dependency in the <code>DESCRIPTION</code> file. Once again, the usethis package will make this easier for us to do:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Run</strong> <code>usethis::use_package("&lt;external-package&gt;")</code></p>
+<pre class="r"><code>usethis::use_package(&quot;gradethis&quot;)</code></pre>
+<ul>
+<li>You should see something like this in the console output:
+<center>
+<img src="images/pkg-gradethis.png" style="width:70.0%" />
+</center></li>
+</ul></li>
+<li><p>You can confirm the package has been added as an import when you <strong>open the <code>DESCRIPTION</code> file</strong> in your project root.</p></li>
+</ol>
+<p>** TO-DO: figure out what to do about NAMESPACE. Otherwise will get</p>
+<pre><code>Quitting from lines 8-10 (lesson1.Rmd) 
+Error: &#39;gradethis_setup&#39; is not an exported object from &#39;namespace:gradethis&#39;</code></pre>
+<p>when creating this package with tutorials containing the setup for gradethis.</p>
+<p><br />
+</p>
+</div>
+<div id="optionally-edit-your-package-metadata" class="section level3">
+<h3>(Optionally) Edit your package metadata</h3>
+<p>This step is not necessary to have a working, usable package, but it creates a nicer experience for users interested in learning more about the contents of your package and how to use them.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Open the <code>DESCRIPTION</code> file</strong> in your project root.</p></li>
+<li><p><strong>Edit the file</strong> with your own information. Not sure what to write for each field? See <a href="https://r-pkgs.org/description.html#pkg-description">this resource</a> for suggestions.</p></li>
+<li><p>Finally, make sure to <strong><em>Build</em> &gt; <em>Install and Restart</em></strong> your package again to include these changes.</p></li>
+</ol>
+<p><br />
+</p>
+</div>
+<div id="getting-your-tutorial-to-your-audience" class="section level3">
+<h3>Getting your tutorial to your audience</h3>
+<p>Your tutorial package has (finally!) been built, now it’s time to get it out there!</p>
+<ol style="list-style-type: decimal">
+<li><p><strong><a href="https://happygitwithr.com/rstudio-git-github.html#make-local-changes-save-commit">Commit</a> and <a href="https://happygitwithr.com/rstudio-git-github.html#push-your-local-changes-online-to-github">push</a></strong> to GitHub to share your tutorial package with the world.</p></li>
+<li><p><strong>Have users <em>install</em> your package</strong> from GitHub with <code>remotes::install_github(“&lt;your-repo&gt;/&lt;package-name&gt;")</code></p>
+<pre class="r"><code>remotes::install_github(&quot;dcossyleon/tutorialpackage&quot;)</code></pre></li>
+<li><p><strong>Have users <em>run</em> your tutorial</strong> with <code>learnr::run_tutorial("&lt;tutorial-name&gt;", "&lt;package-name&gt;")</code> (users will need to install the learnr package first).</p>
+<pre class="r"><code>learnr::run_tutorial(&quot;lesson1&quot;, &quot;tutorialpackage&quot;)</code></pre></li>
+</ol>
+<p>We recommend including these latter two instructions in a README file, which we introduce below.</p>
+<p><br />
+</p>
+</div>
+<div id="create-a-readme-file" class="section level3">
+<h3>Create a README file</h3>
+<p>You can include additional information in a <code>README.Rmd</code> file for your package. At a minimum, we recommend you include a line about how users can install and load the tutorials.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Run</strong> <code>use_readme_rmd()</code> to create and open a README file.</p>
+<pre class="r"><code>use_readme_rmd()</code></pre></li>
+<li><p><strong>Edit</strong> the file to meet your needs. Need ideas of what to include? Check out <a href="https://r-pkgs.org/whole-game.html#use_readme_rmd">this resource</a>.</p></li>
+<li><p><strong>Click Knit</strong> so that it creates a corresponding <code>README.md</code> file.</p>
+<p>Or, alternatively, run:</p>
+<pre class="r"><code>usethis::build_readme()</code></pre></li>
+<li><p><strong>Commit and push</strong> your changes to GitHub.</p></li>
+</ol>
+<p><br />
+</p>
+</div>
+<div id="updating-your-package" class="section level3">
+<h3>Updating your package</h3>
+<p>After your package has been installed by your users, you can continue to update or add tutorials. Each time you make changes to the contents of your package, you must <em>Build</em> then <em>Install and Restart</em> the package locally before pushing your changes to GitHub.</p>
+<p>Users can then access the updated content by simply re-installing your package.</p>
+<p><br />
+</p>
+</div>
+</div>
+<div id="tldr" class="section level2">
+<h2>tl;dr</h2>
+<p>Here’s how you put an interactive learnr tutorial in a package:</p>
+<ol style="list-style-type: decimal">
+<li><p>In a GitHub-connected RStudio project, run <code>usethis::create_package(getwd())</code> to make a basic package.</p></li>
+<li><p>Run <code>usethis::use_tutorial("&lt;name-of-learnr-file&gt;", "&lt;Title You'd Like the User to See&gt;")</code> to create the learnr tutorial. Customize with your content. Repeat for additional tutorials.</p></li>
+<li><p>Go to <em>Build</em> &gt; <em>Install and Restart</em>.</p></li>
+<li><p>Optionally, run <code>usethis::use_package("gradethis")</code> to add packages dependencies for exercise-checking.</p></li>
+<li><p>Optionally, edit the <code>DESCRIPTION</code> file.</p></li>
+<li><p>Run <code>usethis::use_readme_rmd()</code> to add a README. Knit when you’re done.</p></li>
+<li><p>Push to GitHub and have folks install with <code>remotes::install_github("&lt;your-repo&gt;/&lt;package-name&gt;")</code></p></li>
+<li><p>Repeat steps 2,3, and 7 anytime you update your tutorial package.</p></li>
+</ol>
+<p><br />
+</p>
+</div>
+<div id="thats-a-wrap" class="section level2">
+<h2>That’s a wrap!</h2>
+<p>Congratulations, you’ve created a tutorial package!</p>
+<p>From here, there are many ways to extend what you’ve done. For example, you could decide to bundle up custom data sets in your package, as explained in the <a href="https://r-pkgs.org/data.html#data-sysdata">R Packages</a> book. And you might consider adding <a href="https://r-pkgs.org/man.html#man-packages">package documentation</a>.</p>
+<p>If you’d like to see an example of a tutorial package “in the wild”, check out the <a href="https://github.com/tidymodels/learntidymodels">GitHub repository for the <code>learntidymodels</code> package</a>.</p>
+<p>Finally, you may also be interested in exploring mybinder.org as a platform for delivering interactive learnr tutorials to users, which you can learn more about with this <a href="http://laderast.github.io/2020/09/15/getting-learnr-tutorials-to-run-on-mybinder-org/">helpful post</a> by Ted Laderas, PhD.</p>
+<p>Happy tutorial-ing!</p>
+<p><br />
+</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
